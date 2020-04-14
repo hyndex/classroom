@@ -19,6 +19,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('login/', LoginView.as_view()),
     path('upload/', picUploadView.as_view()),
+    path('upload/', GroupRoleViewSet.as_view()),
 ]
 
 if settings.DEBUG:

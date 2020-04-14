@@ -26,7 +26,7 @@ def ProfileQuerySet(request):
         return Profile.objects.all()
     profile=Profile.objects.filter(user__username=request.user.username)
     if profile.count()>0:
-        return Profile.objects.filter(corp__user__username=request.user.username)
+        return profile
     return Profile.objects.none()
 
 
@@ -42,18 +42,52 @@ class GroupPermission(BasePermission):
             if (request.user.username == 'admin'):
                 return True
             if request.method in ['GET','DELETE','PUT']:
-                teacher=Group.objects.filter(teacher__user__username=request.user.username).count()>0
-                student=Group.objects.filter(student__user__username=request.user.username).count()>0
-                if teacher or (student):# and request.method == 'GET'):
-                    return True
+                return True
         return False
 
 def GroupQuerySet(request):
     if (request.user.username == 'admin'):
         return Group.objects.all()
-    group=Group.objects.filter(Q(teacher__user__username=request.user.username) | Q(student__user__username=request.user.username))
+
+    member=GroupRole.objects.filter(profile__user__username=request.user.username)
+    queries = [Q(id=value.id) for value in member]
+    query = queries.pop()
+    for item in queries:
+        query |= item
+    group=Group.objects.filter(Q(createdBy__user__username=request.user.username) | query)
+
     if request.method == 'GET':
         return group
     if request.method in ['PUT','DELETE']:
-        return group.filter(teacher__user__username=request.user.username)
+        return group.filter(createdBy__user__username=request.user.username)
+    return Group.objects.none()
+
+
+
+class GroupRolePermission(BasePermission):
+    message='You are not authorized to this data'
+    def has_permission(self, request, view):
+        SAFE_METHOD = ['GET','POST','PUT','DELETE']
+        if request.method not in SAFE_METHOD:
+            return False
+        if request.user.is_authenticated:
+            if (request.user.username == 'admin'):
+                return True
+
+            if request.method == ['POST',]:
+                group=Group.objects.filter(id=request.data["group"],createdBy__user__username=request.user.username)
+                if group.count()==1:
+                    return True
+                else:
+                    return False
+            elif request.method == ['GET','DELETE']:
+                return True
+
+        return False
+
+def GroupRoleQuerySet(request):
+    if (request.user.username == 'admin'):
+        return Group.objects.all()
+    if request.method in ['GET','DELETE']:
+        return group.filter(createdBy__user__username=request.user.username)
     return Group.objects.none()

@@ -9,9 +9,13 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from django.http import JsonResponse
 from .serializers import *
+from .permissions import *
+import copy
 from rest_framework import filters
 from rest_framework.decorators import action
+import json
 from rest_framework.parsers import FormParser, MultiPartParser,JSONParser, FileUploadParser
+from rest_framework.parsers import JSONParser
 from django.core.files.storage import default_storage
 from django.core.files.storage import FileSystemStorage
 # Create your views here.
@@ -39,6 +43,18 @@ class GroupViewSet(viewsets.ModelViewSet):
     model=serializer_class().Meta().model
     def get_queryset(self):
         return GroupQuerySet(self.request)
+
+class GroupRoleViewSet(viewsets.ModelViewSet):
+    queryset = GroupRole.objects.all()
+    # search_fields = ['name']
+    # filter_backends = (filters.SearchFilter,)
+    serializer_class = GroupRoleSerializer
+    permission_classes = [GroupRolePermission]
+    model=serializer_class().Meta().model
+    def get_queryset(self):
+        return GroupRoleQuerySet(self.request)
+
+
 
 
 class picUploadView(APIView):

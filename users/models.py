@@ -21,9 +21,19 @@ class Profile(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
-    teacher=models.ManyToManyField(Profile,related_name='teacher')
     image = models.ImageField(upload_to='Group/',blank=True, null=True)
-    students=models.models.ManyToManyField(Profile,related_name='student')
+    students=models.ManyToManyField(Profile,related_name='GroupStudents')
+    date_updated = models.DateTimeField(default=dt.datetime.now(), blank=True)
+    createdBy = models.ForeignKey(Profile,on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.name
+
+
+class GroupRole(models.Model):
+    profile = models.ForeignKey(Profile,on_delete=models.CASCADE)
+    group = models.ForeignKey(Group,on_delete=models.CASCADE)
+    role = models.TextField(default='Student')
     date_updated = models.DateTimeField(default=dt.datetime.now(), blank=True)
     
     def __str__(self):
