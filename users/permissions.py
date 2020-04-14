@@ -46,17 +46,23 @@ class GroupPermission(BasePermission):
         return False
 
 def GroupQuerySet(request):
+    # return Group.objects.all()
     if (request.user.username == 'admin'):
         return Group.objects.all()
 
+
     member=GroupRole.objects.filter(profile__user__username=request.user.username)
-    queries = [Q(id=value.id) for value in member]
-    query = queries.pop()
-    for item in queries:
-        query |= item
-    group=Group.objects.filter(Q(createdBy__user__username=request.user.username) | query)
+    if member.count()>0:
+        queries = [Q(id=value.id) for value in member]
+        query = queries.pop()
+        for item in queries:
+            query |= item
+        group=Group.objects.filter(Q(createdBy__user__username=request.user.username) | query)
+    else:
+        group=Group.objects.filter(Q(createdBy__user__username=request.user.username))
 
     if request.method == 'GET':
+        return Group.objects.all()
         return group
     if request.method in ['PUT','DELETE']:
         return group.filter(createdBy__user__username=request.user.username)
@@ -74,20 +80,28 @@ class GroupRolePermission(BasePermission):
             if (request.user.username == 'admin'):
                 return True
 
-            if request.method == ['POST',]:
-                group=Group.objects.filter(id=request.data["group"],createdBy__user__username=request.user.username)
-                if group.count()==1:
-                    return True
-                else:
-                    return False
-            elif request.method == ['GET','DELETE']:
+            if request.method in ['POST','GET','DELETE']:
                 return True
 
         return False
 
 def GroupRoleQuerySet(request):
     if (request.user.username == 'admin'):
-        return Group.objects.all()
-    if request.method in ['GET','DELETE']:
-        return group.filter(createdBy__user__username=request.user.username)
-    return Group.objects.none()
+        return GroupRole.objects.all()
+
+    # member=GroupRole.objects.filter(profile__user__username=request.user.username)
+    # if member.count()>0:
+    #     queries = [Q(group__id=value.id) for value in member]
+    #     query = queries.pop()
+    #     for item in queries:
+    #         query |= item
+    #     group=GroupRole.objects.filter(Q(group__createdBy__user__username=request.user.username) | query)
+    # else:
+    #     group=GroupRole.objects.filter(Q(group__createdBy__user__username=request.user.username))
+
+    if request.method in ['DELETE','GET']:
+        group=GroupRole.objects.filter(Q(group__createdBy__user__username=request.user.username))
+        return group#.filter(group__createdBy__user__username=request.user.username)
+    # elif request.method == 'GET':
+    #     return group
+    return GroupRole.objects.none()

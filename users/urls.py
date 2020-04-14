@@ -11,6 +11,7 @@ from .views import *
 router = DefaultRouter()
 router.register(r'profile', ProfileViewSet)
 router.register(r'group', GroupViewSet)
+router.register(r'add', GroupRoleViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
@@ -19,7 +20,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('login/', LoginView.as_view()),
     path('upload/', picUploadView.as_view()),
-    path('upload/', GroupRoleViewSet.as_view()),
 ]
 
 if settings.DEBUG:

@@ -40,30 +40,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 
-class GroupRoleSerializer(serializers.ModelSerializer):
-    profile = serializers.CharField(max_length=None, min_length=None)
-    group = serializers.CharField(max_length=None, min_length=None)
+class GroupRoleSerializerforGroup(serializers.ModelSerializer):
     class Meta:
-        model = Group
-        fields=('id','username','group','role','date_updated')
-        read_only_fields=('date_updated',)
-    
-    def create(self, validated_data):
-        username=self.context['request'].user.username
-        profile=validated_data.pop('username')
-        role=validated_data.pop('role')
-        profile=Profile.objects.filter(user__username=username)
-        group=validated_data.pop('group')
-        if not role.lower() in ['student','teacher']:
-            role='student'
-        group=Group.objects.filter(id=group)
-        if group.count()==1 and profile.count()==1:
-                grouprole=GroupRole.objects.create(
-                        group=group[0],
-                        profile=profile[0],
-                        role=role
-                        )
-        return group[0]
+        model = GroupRole
+        fields='__all__'
+        read_only_fields=('date_updated','group','profile')
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -78,11 +59,38 @@ class GroupSerializer(serializers.ModelSerializer):
         group=Group.objects.create(
                     name=validated_data.pop('name'),
                     description=validated_data.pop('description'),
+                    createdBy=teacher
                     )
-        group.teacher.add(teacher)
         return group
 
 
+
+class GroupRoleSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=None, min_length=None,write_only=True)
+    groupid = serializers.CharField(max_length=None, min_length=None,write_only=True)
+    group=GroupSerializer(read_only=True)
+    profile=ProfileSerializer(read_only=True)
+    class Meta:
+        model = GroupRole
+        fields=('id','username','groupid','group','profile','role','date_updated')
+        read_only_fields=('date_updated','group','profile')
+    
+    def create(self, validated_data):
+        username=self.context['request'].user.username
+        profile=validated_data.pop('username')
+        profile=Profile.objects.filter(user__username=profile)
+        group=validated_data.pop('groupid')
+        role=validated_data.pop('role')
+        if not role.lower() in ['student','teacher']:
+            role='student'
+        group=Group.objects.filter(id=group , createdBy__user__username=username)
+        if group.count()==1 and profile.count()==1:
+                grouprole=GroupRole.objects.create(
+                        group=group[0],
+                        profile=profile[0],
+                        role=role
+                        )
+        return group[0]
 
 
 class LoginSerializer(serializers.Serializer):

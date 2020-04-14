@@ -46,8 +46,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 class GroupRoleViewSet(viewsets.ModelViewSet):
     queryset = GroupRole.objects.all()
-    # search_fields = ['name']
-    # filter_backends = (filters.SearchFilter,)
+    filter_backends = (filters.SearchFilter,)
     serializer_class = GroupRoleSerializer
     permission_classes = [GroupRolePermission]
     model=serializer_class().Meta().model
