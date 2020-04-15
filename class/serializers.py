@@ -40,16 +40,17 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         username = self.context['request'].user.username
-        group = validated_data.pop('group')
+        group = validated_data.pop('groupid')
         date_updated=str(dt.datetime.now())
         profile=Profile.objects.get(user__username=username)
         group=Group.objects.get(id=group)
-        assignment = AssignmentSubmit.objects.create(created_by=profile,date_updated=date_updated,group=group,**validated_data)
+        assignment = Assignment.objects.create(created_by=profile,date_updated=date_updated,group=group,**validated_data)
         return assignment
 
     def update(self, instance, validated_data):
         instance.title=validated_data.get('title',instance.title)
         instance.description=validated_data.get('description',instance.description)
+        instance.deadline=validated_data.get('deadline',instance.deadline)
         instance.date_updated=str(dt.datetime.now())
         instance.save()
         return instance

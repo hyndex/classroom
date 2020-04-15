@@ -15,7 +15,9 @@ class ProfilePermission(BasePermission):
         if request.user.is_authenticated:
             if (request.user.username == 'admin'):
                 return True
-            if request.method in ['GET','DELETE','POST','PUT']:
+            if request.method=='POST':
+                return False
+            if request.method in ['GET','DELETE','PUT']:
                 profile=Profile.objects.filter(user__username=request.user.username).count()>0
                 if profile:
                     return True

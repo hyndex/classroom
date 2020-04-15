@@ -33,13 +33,15 @@ def NotesQuerySet(request):
         return Notes.objects.all()
     
     membership=GroupRole.objects.filter(profile__user__username=request.user.username,role='student')
-    queries = [Q(group__id=member.group.id) for member in membership]
-    query = queries.pop()
-    for item in queries:
-        query |= item
+    if membership.count()>0:
+        queries = [Q(group__id=member.group.id) for member in membership]
+        query = queries.pop()
+        for item in queries:
+            query |= item
+        notes=Notes.objects.filter(Q(created_by__user__username=request.user.username) | query)
+    else:
+        notes=Notes.objects.filter(Q(created_by__user__username=request.user.username))
 
-
-    notes=Notes.objects.filter(Q(created_by__user__username=request.user.username) | query)
     if request.method == 'GET':
         return notes
     if request.method in ['PUT','DELETE']:
@@ -64,6 +66,8 @@ class AssignmentPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.username=='admin':
             return True
+        if request.method == 'GET':
+            return True
         if request.method in ['DELETE','PUT']:
             if obj.created_by.user.username == request.user.username:
                 return True            
@@ -74,12 +78,15 @@ def AssignmentQuerySet(request):
         return Assignment.objects.all()
 
     membership=GroupRole.objects.filter(profile__user__username=request.user.username,role='student')
-    queries = [Q(group__id=member.group.id) for member in membership]
-    query = queries.pop()
-    for item in queries:
-        query |= item
+    if membership.count()>0:
+        queries = [Q(group__id=member.group.id) for member in membership]
+        query = queries.pop()
+        for item in queries:
+            query |= item
 
-    assignment=Assignment.objects.filter(Q(created_by__user__username=request.user.username) | query)
+        assignment=Assignment.objects.filter(Q(created_by__user__username=request.user.username) | query)
+    else:
+        assignment=Assignment.objects.filter(Q(created_by__user__username=request.user.username))
     if request.method == 'GET':
         return assignment
     if request.method in ['PUT','DELETE']:
@@ -95,7 +102,11 @@ class AssignmentSubmitPermission(BasePermission):
             return False
         if request.user.is_authenticated:
             if request.method == 'POST':
-                assignment=Assignment.objects.filter(id=request.data["assignmentid"])
+                try:
+                    assignmentid=request.data["assignmentid"]
+                except:
+                    return True
+                assignment=Assignment.objects.filter(id=assignmentid)
                 if not assignment.count()>0:
                     return False
                 assignment=assignment[0]
@@ -113,11 +124,13 @@ class AssignmentSubmitPermission(BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
+        if request.method=='GET':
+            return True
         if request.method in ['DELETE','PUT']:
             if obj.student.user.username == request.user.username:
                 deadline=obj.assignment.deadline
                 today=dt.date.today()
-                if  int(str(today.year)+str(today.month)+str(today.day)) < deadline:
+                if  int(str(today.year)+str(today.month)+str(today.day)) < int(deadline):
                     return True            
         return False
 
@@ -127,7 +140,7 @@ def AssignmentSubmitQuerySet(request):
         return AssignmentSubmit.objects.all()
     assignment=AssignmentSubmit.objects.filter(Q(student__user__username=request.user.username) | Q(assignment__created_by__user__username=request.user.username))
     if request.method in ['PUT','DELETE']:
-        return assignment.filter(created_by__user__username=request.user.username)
+        return assignment.filter(student__user__username=request.user.username)
     if request.method == 'GET':
         return assignment
     return AssignmentSubmit.objects.none()

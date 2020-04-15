@@ -85,12 +85,18 @@ class GroupRoleSerializer(serializers.ModelSerializer):
             role='student'
         group=Group.objects.filter(id=group , createdBy__user__username=username)
         if group.count()==1 and profile.count()==1:
+                exist=GroupRole.objects.filter(group=group[0],profile=profile[0])
+                if exist.count()>0:
+                    return exist
                 grouprole=GroupRole.objects.create(
                         group=group[0],
                         profile=profile[0],
                         role=role
                         )
-        return group[0]
+        try:
+            return grouprole
+        except:
+            return GroupRole.objects.none()
 
 
 class LoginSerializer(serializers.Serializer):

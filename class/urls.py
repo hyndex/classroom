@@ -15,9 +15,9 @@ router.register(r'submit', AssignmentSubmitViewSet)
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
-    path('notes/<int:pk>/', NotesUploadView.as_view()),
-    path('assignment/<int:pk>/', AssignmentUploadView.as_view()),
-    path('submit/<int:pk>/', AssignmentSubmitUploadView.as_view()),
+    path('notes_upload/<int:pk>/', NotesUploadView.as_view()),
+    path('assignment_upload/<int:pk>/', AssignmentUploadView.as_view()),
+    path('submit_upload/<int:pk>/', AssignmentSubmitUploadView.as_view()),
 ]
 if settings.DEBUG:
   urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
