@@ -47,6 +47,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 class GroupRoleViewSet(viewsets.ModelViewSet):
     queryset = GroupRole.objects.all()
     filter_backends = (filters.SearchFilter,)
+    search_fields = ['group__id']
     serializer_class = GroupRoleSerializer
     permission_classes = [GroupRolePermission]
     model=serializer_class().Meta().model
@@ -70,6 +71,13 @@ class picUploadView(APIView):
                 return Response({"success"},status=204)
             else:
                 return Response({"not found"},status=404)
+
+class isAuth(APIView):
+    def get(self, request, format=None):
+        if request.user.is_authenticated:
+            return Response({"success"},status=200)
+        else:
+            return Response({"not found"},status=401)
 
 ############################################################################
 

@@ -8,7 +8,6 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=150, blank=False, null=True, default = '')
     phone = models.CharField(max_length=20, blank=False, null=True, default = '')
-    address = models.CharField(max_length=150, blank=True, null=True)
     status = models.CharField(max_length=10, blank=True, null=True)
     verified = models.CharField(max_length=10, blank=True, null=True)
     image = models.ImageField(upload_to='Profile/',blank=True, null=True)

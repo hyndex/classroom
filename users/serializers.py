@@ -17,7 +17,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
     class Meta:
         model = Profile
-        fields=('id','user','name','image','address','phone')
+        fields=('id','user','name','image','phone')
         read_only_fields=('image',)
 
     def create(self, validated_data):
@@ -30,12 +30,23 @@ class ProfileSerializer(serializers.ModelSerializer):
         try:
             profile=Profile.objects.create(user=user,
                                 name=validated_data.pop('name'),
-                                address=validated_data.pop('address'),
                                 phone=validated_data.pop('phone'),
+                                verified='phone',
                                 )
         except:
             User.objects.filter(username=user_data['username']).delete()
         return profile
+
+    def update(self, instance, validated_data):
+        instance.name=validated_data.get('name',instance.name)
+        instance.email=validated_data.get('email',instance.email)
+        phone=instance.phone
+        instance.phone=validated_data.get('phone',instance.phone)
+        if not phone == instance.phone:
+            instance.verified='phone'
+        instance.date_updated=dt.datetime.now()
+        instance.save()
+        return instance
 
 
 
@@ -50,8 +61,8 @@ class GroupRoleSerializerforGroup(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields=('id','name','description','image','date_updated')
-        read_only_fields=('date_updated','image')
+        fields=('id','name','description','image','createdBy','date_updated')
+        read_only_fields=('date_updated','image','createdBy')
     
     def create(self, validated_data):
         username=self.context['request'].user.username

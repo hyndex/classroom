@@ -19,6 +19,7 @@ class NotesViewSet(viewsets.ModelViewSet):
     queryset = Notes.objects.all()
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter,)
     search_fields = ['title','description','group__id','group__name']
+    filterset_fields = ['group__id','group__name']
     ordering_fields = ['title','created_by','date_updated']
     # ordering=('-date_updated',)
     # filter_fields = ['name','category','instructor','institute']
@@ -60,6 +61,8 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter,)
     search_fields = ['title','description','group__id','group__name','deadline','created_by__user__username']
     ordering_fields = ['title','created_by','group__id','group__name','date_updated','deadline']
+    filterset_fields = ['title','created_by__user__username','group__id','group__name','date_updated','deadline']
+    # filterset_fields  = ['group__id',]
     # ordering=('-date_updated',)
     # filter_fields = ['name','category','instructor','institute']
     serializer_class = AssignmentSerializer

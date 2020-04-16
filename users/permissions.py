@@ -23,6 +23,14 @@ class ProfilePermission(BasePermission):
                     return True
         return False
 
+    def has_object_permission(self, request, view, obj):
+        if request.user.username=='admin':
+            return True
+        if request.method in ['PUT','DELETE','GET']:
+            if obj.user.username == request.user.username:
+                return True            
+        return False
+
 def ProfileQuerySet(request):
     if (request.user.username == 'admin'):
         return Profile.objects.all()
@@ -45,6 +53,13 @@ class GroupPermission(BasePermission):
                 return True
             if request.method in ['GET','DELETE','PUT']:
                 return True
+        return False
+    def has_object_permission(self, request, view, obj):
+        if request.user.username=='admin':
+            return True
+        if request.method in ['DELETE','GET','PUT']:
+            if obj.createdBy.user.username == request.user.username:
+                return True            
         return False
 
 def GroupQuerySet(request):
@@ -87,6 +102,14 @@ class GroupRolePermission(BasePermission):
 
         return False
 
+    def has_object_permission(self, request, view, obj):
+        if request.user.username=='admin':
+            return True
+        if request.method in ['DELETE','GET']:
+            if obj.group.createdBy.user.username == request.user.username:
+                return True            
+        return False
+
 def GroupRoleQuerySet(request):
     if (request.user.username == 'admin'):
         return GroupRole.objects.all()
@@ -101,8 +124,8 @@ def GroupRoleQuerySet(request):
     # else:
     #     group=GroupRole.objects.filter(Q(group__createdBy__user__username=request.user.username))
 
-    if request.method in ['DELETE','GET']:
-        group=GroupRole.objects.filter(Q(group__createdBy__user__username=request.user.username))
+    if request.method in ['GET','DELETE']:
+        group=GroupRole.objects.filter(group__createdBy__user__username=request.user.username)
         return group#.filter(group__createdBy__user__username=request.user.username)
     # elif request.method == 'GET':
     #     return group
