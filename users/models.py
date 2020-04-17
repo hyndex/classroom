@@ -32,8 +32,8 @@ class Group(models.Model):
 class GroupRole(models.Model):
     profile = models.ForeignKey(Profile,on_delete=models.CASCADE)
     group = models.ForeignKey(Group,on_delete=models.CASCADE)
-    role = models.TextField(default='Student')
+    role = models.TextField(default='student')
     date_updated = models.DateTimeField(default=dt.datetime.now(), blank=True)
     
     def __str__(self):
-        return self.name
+        return self.profile.user.username

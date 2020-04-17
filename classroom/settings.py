@@ -25,7 +25,7 @@ SECRET_KEY = '9#!!jwv=qjdpnmwa*lq)1r)62&w@odgt&nd4vk-%r)64+@qvw='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -60,6 +60,7 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+INSTALLED_APPS += ['django_extensions']
 
 
 REST_FRAMEWORK = {

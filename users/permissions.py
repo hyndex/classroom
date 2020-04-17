@@ -66,11 +66,10 @@ def GroupQuerySet(request):
     # return Group.objects.all()
     if (request.user.username == 'admin'):
         return Group.objects.all()
-
-
-    member=GroupRole.objects.filter(profile__user__username=request.user.username)
-    if member.count()>0:
-        queries = [Q(id=value.id) for value in member]
+    
+    grouprole=GroupRole.objects.filter(profile__user__username=request.user.username)
+    if grouprole.count()>0:
+        queries = [Q(id=member.group.id) for member in grouprole]
         query = queries.pop()
         for item in queries:
             query |= item
@@ -79,7 +78,6 @@ def GroupQuerySet(request):
         group=Group.objects.filter(Q(createdBy__user__username=request.user.username))
 
     if request.method == 'GET':
-        return Group.objects.all()
         return group
     if request.method in ['PUT','DELETE']:
         return group.filter(createdBy__user__username=request.user.username)
