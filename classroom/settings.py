@@ -38,11 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_filters',
     'rest_framework.authtoken',
+    'dj_rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'dj_rest_auth.registration',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.twitter',
+    'django_filters',
     'sorl.thumbnail',
     'corsheaders',
-    'class',
+    'classes',
     'users',
     'django_cleanup.apps.CleanupConfig',
 ]
@@ -58,6 +66,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SITE_ID = 1
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 INSTALLED_APPS += ['django_extensions']
@@ -66,11 +75,14 @@ INSTALLED_APPS += ['django_extensions']
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        'dj_rest_auth.utils.JWTCookieAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
 
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'gotoclassjwt'
 ROOT_URLCONF = 'classroom.urls'
 
 TEMPLATES = [

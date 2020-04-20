@@ -69,6 +69,13 @@ class AssignmentSubmitSerializer(serializers.ModelSerializer):
         profile=Profile.objects.get(user__username=username)
         assignment=Assignment.objects.get(id=assignment)
         date_updated=str(dt.datetime.now())
+        instance=AssignmentSubmit.objects.filter(student=profile,assignment=assignment)
+        if instance.count()>0:
+            instance=instance[0]
+            instance.title=validated_data.get('title',instance.title)
+            instance.description=validated_data.get('description',instance.description)
+            instance.save()
+            return instance
         ass_submit = AssignmentSubmit.objects.create(date_updated=date_updated,student=profile,assignment=assignment,**validated_data)
         return ass_submit
 

@@ -18,6 +18,8 @@ from rest_framework.parsers import FormParser, MultiPartParser,JSONParser, FileU
 from rest_framework.parsers import JSONParser
 from django.core.files.storage import default_storage
 from django.core.files.storage import FileSystemStorage
+from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
 # Create your views here.
 
 
@@ -80,6 +82,13 @@ class isAuth(APIView):
             return Response({"not found"},status=401)
 
 ############################################################################
+
+
+
+
+class FacebookLogin(SocialLoginView):
+    adapter_class = FacebookOAuth2Adapter
+
 
 class ChangePasswordView(UpdateAPIView):
         """

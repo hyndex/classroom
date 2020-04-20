@@ -7,6 +7,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import *
 
+# from rest_framework_simplejwt.views import (
+#     TokenObtainPairView,
+#     TokenRefreshView,
+# )
+
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'profile', ProfileViewSet)
@@ -20,7 +25,9 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('login/', LoginView.as_view()),
     path('upload/', picUploadView.as_view()),
-    path('auth/', isAuth.as_view()),
+    path('auth/', include('dj_rest_auth.urls')),
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('auth/facebook/', FacebookLogin.as_view(), name='fb_login')
 ]
 
 if settings.DEBUG:

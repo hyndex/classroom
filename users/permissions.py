@@ -57,7 +57,9 @@ class GroupPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.username=='admin':
             return True
-        if request.method in ['DELETE','GET','PUT']:
+        if request.method == 'GET':
+            return True  
+        if request.method in ['DELETE','PUT']:
             if obj.createdBy.user.username == request.user.username:
                 return True            
         return False
